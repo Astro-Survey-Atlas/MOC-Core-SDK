@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://astro-survey-atlas.example/contracts/coverage-task-v1.schema.json",
+  "title": "Assets coverage task input for standard data-warehouse CRDs",
+  "description": "Assets-side input used to render a standard AstroDataSource and AstroMetadataScanTask. It carries task references and constraints; credential storage or resolution, sink implementation and project task history are outside this envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "taskId", "layer", "connector", "recipe", "execution", "output"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "taskId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layerId", "surveyId", "releaseId", "product", "mode", "coverageRole", "dataOrigin", "sourceTier"],
+      "properties": {
+        "layerId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "surveyId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "releaseId": {"type": "string", "minLength": 1},
+        "product": {"type": "string", "minLength": 1},
+        "mode": {"enum": ["fits-wcs", "catalog-radec", "nested-healpix", "regions", "tile-table"]},
+        "coverageRole": {"enum": ["image_extent", "object_presence", "footprint_extent"]},
+        "dataOrigin": {"enum": ["observed", "simulated", "catalog"]},
+        "sourceTier": {"enum": ["official_geometry", "official_inventory_derived", "third_party_moc", "best_effort_derived", "user_file_derived"]}
+      }
+    },
+    "connector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connectorId", "kind", "configSha256"],
+      "description": "Assets-managed connector or DataSource reference. The identifier and configuration digest are part of this input; storage and resolution of credentials are owned by the submitting and executing components.",
+      "properties": {
+        "connectorId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "kind": {"enum": ["s3", "oss", "jdbc", "filesystem"]},
+        "configSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "coordinateFrame", "ordering", "maxOrder", "queryOrder", "previewOrder"],
+      "properties": {
+        "mode": {"enum": ["fits-wcs", "catalog-radec", "nested-healpix", "regions", "tile-table"]},
+        "coordinateFrame": {"const": "ICRS"},
+        "ordering": {"const": "NESTED"},
+        "maxOrder": {"type": "integer", "minimum": 0, "maximum": 29},
+        "queryOrder": {"const": 8},
+        "previewOrder": {"const": 4},
+        "selection": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executor", "timeoutSeconds", "maxBytes"],
+      "description": "Execution constraints for this Assets submission to the data-warehouse operator.",
+      "properties": {
+        "executor": {"const": "data-warehouse"},
+        "timeoutSeconds": {"type": "integer", "minimum": 1},
+        "maxBytes": {"type": "integer", "minimum": 1},
+        "shards": {"type": "integer", "minimum": 1}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resultKind", "contractVersion"],
+      "description": "Assets finalizer input reference. The selected sink and its storage semantics are defined by the rendered ScanTask.",
+      "properties": {
+        "resultKind": {"enum": ["normalized-scan", "locked-build-input"]},
+        "contractVersion": {"const": "1.0.0"},
+        "path": {"type": "string", "pattern": "^(warehouse-results|snapshots)/[^\\\\]*$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "sizeBytes": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}
