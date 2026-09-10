@@ -18,6 +18,7 @@ from .contract import COVERAGE_ROLES, DATA_ORIGINS, SOURCE_TIERS
 from .core import canonical_json, validate_moc_fits
 
 PACKAGE_VERSION = "3.0.0"
+PACKAGE_VERSION_PATTERN = re.compile(r"^3\.\d+\.\d+$")
 REQUIRED_FILES = frozenset(("resource-package.json", "footprints/survey-footprints.json", "provenance.json", "README.md"))
 MAX_ENTRY_BYTES = 512 * 1024 * 1024
 MAX_PACKAGE_BYTES = 2 * 1024 * 1024 * 1024
@@ -127,8 +128,8 @@ def validate_resource_package(archive: str | Path, *, require_public_catalog: Ma
         if missing:
             raise PackageValidationError(f"Missing v3 entries: {', '.join(sorted(missing))}")
         manifest = json.loads(source.read("resource-package.json"))
-        if manifest.get("schemaVersion") != 3 or manifest.get("version") != PACKAGE_VERSION:
-            raise PackageValidationError("Only Resource Package 3.0.0 is accepted")
+        if manifest.get("schemaVersion") != 3 or not isinstance(manifest.get("version"), str) or not PACKAGE_VERSION_PATTERN.match(manifest["version"]):
+            raise PackageValidationError("Only Resource Package v3 (3.x.y) is accepted")
         if "evidenceRole" in manifest:
             raise PackageValidationError("evidenceRole is removed; use coverageRole")
         if "coordinateFrame" in manifest and manifest["coordinateFrame"] != "ICRS":
@@ -187,7 +188,7 @@ def validate_resource_package(archive: str | Path, *, require_public_catalog: Ma
         if not isinstance(provenance, Mapping) or provenance.get("schemaVersion") is None:
             raise PackageValidationError("Invalid provenance document")
         if require_public_catalog is not None:
-            matches = [entry for entry in require_public_catalog.get("packages", []) if entry.get("id") == manifest.get("id") and entry.get("version") == PACKAGE_VERSION]
+            matches = [entry for entry in require_public_catalog.get("packages", []) if entry.get("id") == manifest.get("id") and entry.get("version") == manifest.get("version")]
             if not any(entry.get("sha256") == archive_sha256 for entry in matches):
                 raise PackageValidationError("Package is not trusted by the Assets public catalog")
     return ValidatedPackage(manifest, archive_sha256, tuple(names))
@@ -211,8 +212,9 @@ def _zip_write(archive: zipfile.ZipFile, name: str, data: bytes) -> None:
 def build_resource_package(spec: Mapping[str, Any], output: str | Path, *, base_dir: str | Path = ".") -> ValidatedPackage:
     """Build a deterministic v3 archive from local, already-reviewed inputs."""
 
-    if spec.get("version", PACKAGE_VERSION) != PACKAGE_VERSION:
-        raise PackageValidationError("New Assets builds only produce version 3.0.0")
+    version = str(spec.get("version", PACKAGE_VERSION))
+    if not PACKAGE_VERSION_PATTERN.match(version):
+        raise PackageValidationError("New Assets builds only produce Resource Package 3.x.y")
     package_id = spec.get("id")
     if not isinstance(package_id, str) or not package_id:
         raise PackageValidationError("Package id is required")
@@ -245,7 +247,7 @@ def build_resource_package(spec: Mapping[str, Any], output: str | Path, *, base_
     manifest = {
         "schemaVersion": 3,
         "id": package_id,
-        "version": PACKAGE_VERSION,
+        "version": version,
         "surveyId": spec.get("surveyId"),
         "layers": sorted(layers, key=lambda layer: layer["layerId"]),
         "files": [
