@@ -1,0 +1,403 @@
+<!doctype html>
+<!--
+Copyright 2026 Astro Survey Atlas contributors.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Beginner-friendly documentation for MOC-Core-SDK: deterministic ICRS/NESTED HEALPix coverage, FITS MOCs, projections, and Resource Package v3 archives." data-i18n-meta="meta.description">
+  <title>MOC Core | Astro Survey Atlas</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="i18n.js" defer></script>
+  <script src="main.js" defer></script>
+  <script src="theme.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content" data-i18n="a11y.skip">Skip to documentation</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-wrap" href="#overview" aria-label="MOC Core documentation home" data-i18n-aria-label="a11y.home">
+        <img class="brand-logo" src="assets/logo.svg" alt="" width="32" height="32">
+        <span class="brand-text">MOC Core <span class="brand-badge" data-i18n="brand.docs">Docs</span></span>
+      </a>
+      <nav aria-label="Primary navigation" data-i18n-aria-label="a11y.primaryNav">
+        <ul class="nav-links">
+          <li><a class="nav-link" href="#build" data-i18n="nav.quickStart">Quick start</a></li>
+          <li><a class="nav-link" href="#algorithms" data-i18n="nav.algorithms">Algorithms</a></li>
+          <li><a class="btn btn-secondary btn-sm" href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">↗</span><span data-i18n="nav.github">GitHub repository</span></a></li>
+          <li><button type="button" id="language-toggle" class="btn btn-secondary btn-sm" aria-label="Switch to Chinese" data-i18n-aria-label="a11y.languageToggle" hidden>中文</button></li>
+          <li><button type="button" id="theme-toggle" class="btn btn-secondary btn-sm" aria-label="Toggle theme" data-i18n-aria-label="a11y.themeToggle" hidden><span aria-hidden="true">◐</span><span data-theme-label>Dark mode</span></button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="doc-wrapper">
+    <aside class="sidebar">
+      <nav aria-label="On this page" class="sidebar-group" data-i18n-aria-label="a11y.onThisPage">
+        <p class="sidebar-title" data-i18n="sidebar.documentation">Documentation</p>
+        <ul class="sidebar-list">
+          <li class="sidebar-item active"><a href="#overview" data-i18n="nav.overview">01 / Why a sky grid?</a></li>
+          <li class="sidebar-item"><a href="#capabilities" data-i18n="nav.capabilities">02 / What the Core builds</a></li>
+          <li class="sidebar-item"><a href="#modes" data-i18n="nav.modes">03 / Choose an input mode</a></li>
+          <li class="sidebar-item"><a href="#algorithms" data-i18n="nav.algorithmsSection">04 / See the algorithms</a></li>
+          <li class="sidebar-item"><a href="#build" data-i18n="nav.build">05 / Build, project, package</a></li>
+          <li class="sidebar-item"><a href="#limits" data-i18n="nav.limits">06 / Know the boundaries</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-group">
+        <p class="sidebar-title" data-i18n="sidebar.contracts">Canonical contracts</p>
+        <ul class="sidebar-list">
+          <li class="sidebar-item"><a href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/blob/main/docs/moc-core-contract.md" target="_blank" rel="noopener noreferrer">Core contract ↗</a></li>
+          <li class="sidebar-item"><a href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/tree/main/contracts" target="_blank" rel="noopener noreferrer">JSON schemas ↗</a></li>
+          <li class="sidebar-item"><a href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/tree/main/fixtures/conformance" target="_blank" rel="noopener noreferrer">Conformance fixtures ↗</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-group">
+        <p class="sidebar-title" data-i18n="sidebar.related">Related projects</p>
+        <ul class="sidebar-list">
+          <li class="sidebar-item"><a href="https://github.com/Astro-Survey-Atlas/Assets" target="_blank" rel="noopener noreferrer">Assets ↗</a></li>
+          <li class="sidebar-item"><a href="https://github.com/Astro-Survey-Atlas/Workspace" target="_blank" rel="noopener noreferrer">Workspace ↗</a></li>
+          <li class="sidebar-item"><a href="https://github.com/Astro-Survey-Atlas/Warehouse" target="_blank" rel="noopener noreferrer">Warehouse ↗</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main id="main-content" class="main-content" tabindex="-1">
+      <section id="overview" class="hero doc-section" aria-labelledby="overview-title" data-title-key="nav.overview">
+        <p class="hero-pill"><span class="pill-dot"></span><span data-i18n="hero.eyebrow">Astro Survey Atlas / scientific core</span></p>
+        <h1 id="overview-title" class="hero-title"><span data-i18n="hero.title.line1">Turn local sky evidence</span><br><span data-i18n="hero.title.line2">into a map computers can compare.</span></h1>
+        <p class="hero-desc" data-i18n="hero.description.one">MOC-Core-SDK turns reviewed local inputs into a standard map of sky coverage. It speaks ICRS, NESTED HEALPix, and IVOA FITS MOC so different projects can exchange the same spatial evidence.</p>
+        <p class="hero-desc" data-i18n="hero.description.two">You do not need to begin with the mathematics. Think of the sky as a globe covered by equal-area tiles: the Core decides which tiles are supported by your images, catalog, regions, or existing MOC, then writes the result in a deterministic form.</p>
+        <div class="hero-buttons">
+          <a class="btn btn-primary" href="#concepts"><span aria-hidden="true">↓</span><span data-i18n="hero.primary">Start with the sky grid</span></a>
+          <a class="btn btn-secondary" href="#build"><span aria-hidden="true">{ }</span><span data-i18n="hero.secondary">See a real build</span></a>
+        </div>
+
+        <div class="arch-diagram" aria-label="MOC Core data flow" data-i18n-aria-label="diagram.dataFlow">
+          <div class="arch-nodes">
+            <div class="arch-node">
+              <span class="arch-node-icon icon-source" aria-hidden="true"></span>
+              <p class="arch-node-name" data-i18n="flow.input.name">Reviewed local input</p>
+              <p class="arch-node-role" data-i18n="flow.input.role">FITS / table / region / MOC</p>
+            </div>
+            <span class="arch-arrow"><svg class="arch-arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path></svg><span class="arch-arrow-label" data-i18n="flow.lock">lock snapshot</span></span>
+            <div class="arch-node highlight-core">
+              <span class="arch-node-icon icon-core" aria-hidden="true"></span>
+              <p class="arch-node-name">MOC-Core-SDK</p>
+              <p class="arch-node-role" data-i18n="flow.core.role">validate / rasterize / canonicalize</p>
+            </div>
+            <span class="arch-arrow"><svg class="arch-arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path></svg><span class="arch-arrow-label" data-i18n="flow.write">write canonical MOC</span></span>
+            <div class="arch-node">
+              <span class="arch-node-icon icon-moc" aria-hidden="true"></span>
+              <p class="arch-node-name">IVOA FITS MOC</p>
+              <p class="arch-node-role" data-i18n="flow.moc.role">ICRS / NESTED / NUNIQ</p>
+            </div>
+            <span class="arch-arrow"><svg class="arch-arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path></svg><span class="arch-arrow-label" data-i18n="flow.consume">project / publish</span></span>
+            <div class="arch-node">
+              <span class="arch-node-icon icon-app" aria-hidden="true"></span>
+              <p class="arch-node-name" data-i18n="flow.output.name">Assets / Workspace / Warehouse</p>
+              <p class="arch-node-role" data-i18n="flow.output.role">one shared spatial language</p>
+            </div>
+          </div>
+        </div>
+        <div class="hero-facts" aria-label="Core guarantees" data-i18n-aria-label="hero.facts.label">
+          <span><strong>offline</strong><span data-i18n="hero.fact.offline">after snapshot lock</span></span>
+          <span><strong>ICRS</strong><span data-i18n="hero.fact.frame">one celestial frame</span></span>
+          <span><strong>NESTED</strong><span data-i18n="hero.fact.ordering">one cell ordering</span></span>
+          <span><strong>FITS</strong><span data-i18n="hero.fact.artifact">one authoritative artifact</span></span>
+        </div>
+      </section>
+
+      <section id="concepts" class="subsection" aria-labelledby="concepts-title">
+        <p class="section-tag">01 / <span data-i18n="concepts.tag">The beginner version</span></p>
+        <h2 id="concepts-title" data-i18n="concepts.title">A MOC is a list of sky tiles</h2>
+        <p class="section-lead" data-i18n="concepts.lead">A Multi-Order Coverage map does not copy an image or catalog into a new service. It records which parts of the sky are covered, using a hierarchy of equal-area HEALPix cells.</p>
+        <div class="concept-grid">
+          <article class="concept-explainer">
+            <div class="concept-visual" aria-hidden="true">
+              <span class="sky-cell cell-a"></span><span class="sky-cell cell-b"></span><span class="sky-cell cell-c"></span><span class="sky-cell cell-d"></span>
+              <span class="sky-cell cell-e"></span><span class="sky-cell cell-f"></span><span class="sky-cell cell-g"></span><span class="sky-cell cell-h"></span>
+              <span class="sky-point point-a"></span><span class="sky-point point-b"></span><span class="sky-point point-c"></span>
+            </div>
+            <div>
+              <h3 data-i18n="concepts.tile.title">What is a cell?</h3>
+              <p data-i18n="concepts.tile.body">Imagine a transparent grid wrapped around the celestial sphere. A cell says “this patch is included.” A MOC stores the included cells, not the pixels of your science data.</p>
+            </div>
+          </article>
+          <article class="definition-card">
+            <h3><code>order</code></h3>
+            <p data-i18n="concepts.order.body">The detail level. Every step splits one parent into four children.</p>
+            <p class="definition-math"><code>nside = 2<sup>order</sup></code></p>
+          </article>
+          <article class="definition-card">
+            <h3><code>ipix</code></h3>
+            <p data-i18n="concepts.ipix.body">The pixel number inside one order. Together, <code>order</code> and <code>ipix</code> identify one nested cell.</p>
+            <p class="definition-math"><code>0 ... 12 × 4<sup>order</sup> − 1</code></p>
+          </article>
+        </div>
+
+        <div class="calculator-card" id="order-calculator">
+          <div class="calculator-heading">
+            <div>
+              <p class="eyebrow" data-i18n="calculator.eyebrow">Offline calculator</p>
+              <h3 data-i18n="calculator.title">How fine is one order?</h3>
+            </div>
+            <span class="status-pill status-local" data-i18n="calculator.badge">runs in your browser</span>
+          </div>
+          <div class="calculator-controls">
+            <label class="form-label" for="order-input"><span data-i18n="calculator.orderLabel">HEALPix order</span><input id="order-input" class="form-input compact-input" type="number" min="0" max="10" value="8" inputmode="numeric"></label>
+            <button type="button" id="order-calculate" class="btn btn-primary"><span aria-hidden="true">↻</span><span data-i18n="calculator.calculate">Calculate</span></button>
+          </div>
+          <div id="order-output" class="calculator-output" role="status" aria-live="polite"></div>
+          <p class="form-note" data-i18n="calculator.note">The Core accepts orders 0–29. The calculator stops at 10 so the cell count remains easy to read.</p>
+        </div>
+      </section>
+
+      <section id="capabilities" class="doc-section" aria-labelledby="capabilities-title" data-title-key="nav.capabilities">
+        <p class="section-tag">02 / <span data-i18n="capabilities.tag">The contract</span></p>
+        <h2 id="capabilities-title" data-i18n="capabilities.title">One core, several useful artifacts</h2>
+        <p class="section-lead" data-i18n="capabilities.lead">The Core keeps one authoritative spatial result and derives the convenient views from it. That makes a preview easy to load without letting a preview pretend to be more precise than the source.</p>
+        <div class="grid-3 artifact-grid">
+          <article class="card accent-indigo">
+            <h3 class="card-title card-title-with-icon"><span class="card-icon icon-document" aria-hidden="true"></span><span>CoverageSpec</span></h3>
+            <p class="card-desc" data-i18n="artifact.spec">A validated recipe: layer identity, input mode, coverage meaning, source tier, maximum order, and the locked snapshot reference.</p>
+            <span class="card-foot"><code>normalize_spec()</code></span>
+          </article>
+          <article class="card accent-magenta">
+            <h3 class="card-title card-title-with-icon"><span class="card-icon icon-grid" aria-hidden="true"></span><span>BuildResult</span></h3>
+            <p class="card-desc" data-i18n="artifact.result">Canonical cells, an IVOA FITS MOC, fixed-order JSON projections, statistics, and redacted provenance.</p>
+            <span class="card-foot"><code>build_layer()</code></span>
+          </article>
+          <article class="card accent-cyan">
+            <h3 class="card-title card-title-with-icon"><span class="card-icon icon-package" aria-hidden="true"></span><span>Resource Package v3</span></h3>
+            <p class="card-desc" data-i18n="artifact.package">A deterministic ZIP for releasing one or more MOCs with footprint metadata, provenance, and a human-readable README.</p>
+            <span class="card-foot"><code>package build</code></span>
+          </article>
+        </div>
+
+        <div class="pipeline-panel">
+          <div class="pipeline-step"><span class="step-number">01</span><strong data-i18n="pipeline.validate">Validate first</strong><span data-i18n="pipeline.validate.body">Reject a bad plan before source enumeration or credentialed I/O.</span></div>
+          <div class="pipeline-step"><span class="step-number">02</span><strong data-i18n="pipeline.read">Read locally</strong><span data-i18n="pipeline.read.body">Parse a locked snapshot or normalized input using one declared mode.</span></div>
+          <div class="pipeline-step"><span class="step-number">03</span><strong data-i18n="pipeline.normalize">Normalize</strong><span data-i18n="pipeline.normalize.body">Deduplicate, remove covered descendants, and collapse complete sibling groups.</span></div>
+          <div class="pipeline-step"><span class="step-number">04</span><strong data-i18n="pipeline.publish">Publish</strong><span data-i18n="pipeline.publish.body">Write stable FITS, projections, statistics, and redacted evidence.</span></div>
+        </div>
+
+        <h3 data-i18n="api.title">The public Python surface</h3>
+        <p data-i18n="api.body">The package root keeps the normal path small. Lower-level helpers exist for conformance and package tooling, but callers can start with a recipe and a build.</p>
+        <div class="code-box">
+          <div class="code-header"><span>Python / public API</span><button type="button" class="copy-btn" data-copy-target="python-api-code"><span aria-hidden="true">⧉</span><span data-i18n="copy.code">Copy code</span></button></div>
+          <pre id="python-api-code" class="code-content" tabindex="0"><code class="language-python">from astro_survey_moc_core import (
+    CoverageSpec,
+    build_layer,
+    canonical_cells,
+    normalize_spec,
+    validate_moc_fits,
+)
+
+spec = normalize_spec(recipe)
+result = build_layer(recipe, "build/", base_dir="snapshots")
+validate_moc_fits(result.moc_path)
+print(result.sha256, len(result.cells))</code></pre>
+        </div>
+        <div class="callout callout-info"><strong data-i18n="api.note.title">A deliberate boundary:</strong> <span data-i18n="api.note.body">Core accepts local files or already parsed normalized inputs. Source connectors, authentication, remote byte ranges, release review, and online queries belong to the surrounding project.</span></div>
+      </section>
+
+      <section id="modes" class="doc-section" aria-labelledby="modes-title" data-title-key="nav.modes">
+        <p class="section-tag">03 / <span data-i18n="modes.tag">Input adapters</span></p>
+        <h2 id="modes-title" data-i18n="modes.title">Choose the evidence you already have</h2>
+        <p class="section-lead" data-i18n="modes.lead">Each mode turns one kind of local evidence into the same canonical cell language. The Core does not silently guess a different mode or invent a footprint when the evidence is missing.</p>
+        <div class="grid-2 mode-grid">
+          <article class="mode-card">
+            <div class="mode-card-top"><span class="mode-icon icon-image" aria-hidden="true"></span><span class="mode-badge">fits-wcs</span></div>
+            <h3 data-i18n="mode.fits.title">Image footprint from WCS</h3>
+            <p class="card-desc" data-i18n="mode.fits.body">Reads a celestial 2D WCS from FITS or parsed JSON/JSONL headers. It samples the rectangle boundary, converts it to ICRS, and rasterizes it with mocpy.</p>
+            <p class="mode-caveat"><span data-i18n="mode.caveat">Important:</span> <span data-i18n="mode.fits.caveat">the rectangle is the model; masks and bad pixels are not inspected. Finite edge sampling is an approximation.</span></p>
+          </article>
+          <article class="mode-card">
+            <div class="mode-card-top"><span class="mode-icon icon-stars" aria-hidden="true"></span><span class="mode-badge">catalog-radec</span></div>
+            <h3 data-i18n="mode.catalog.title">Object positions from a catalog</h3>
+            <p class="card-desc" data-i18n="mode.catalog.body">Reads RA and Dec from FITS tables, JSON, JSONL, or CSV. RA wraps modulo 360; invalid or non-finite coordinates fail, while rows without coordinates are skipped.</p>
+            <p class="mode-caveat"><span data-i18n="mode.caveat">Important:</span> <span data-i18n="mode.catalog.caveat">a non-positive radius marks point cells; a positive radius asks mocpy for cone coverage.</span></p>
+          </article>
+          <article class="mode-card">
+            <div class="mode-card-top"><span class="mode-icon icon-tiles" aria-hidden="true"></span><span class="mode-badge">nested-healpix</span></div>
+            <h3 data-i18n="mode.nested.title">Cells you already trust</h3>
+            <p class="card-desc" data-i18n="mode.nested.body">Accepts a validated FITS/NUNIQ MOC or JSON/CSV cells. Every cell carries an explicit order and pixel, or scalar values are explicitly declared as <code>uniq</code>.</p>
+            <p class="mode-caveat"><span data-i18n="mode.caveat">Important:</span> <span data-i18n="mode.nested.caveat">the current <code>nside</code> conversion does not enforce that nside is a power of two.</span></p>
+          </article>
+          <article class="mode-card">
+            <div class="mode-card-top"><span class="mode-icon icon-region" aria-hidden="true"></span><span class="mode-badge">regions</span></div>
+            <h3 data-i18n="mode.regions.title">Shapes from a region file</h3>
+            <p class="card-desc" data-i18n="mode.regions.body">Reads a DS9-style regions file or a safe ZIP containing flat <code>.reg</code> entries. Geometry conversion is delegated to regions and mocpy.</p>
+            <p class="mode-caveat"><span data-i18n="mode.caveat">Important:</span> <span data-i18n="mode.regions.caveat">the repository’s strongest tested path is ICRS DS9 regions; other frames depend on the upstream libraries.</span></p>
+          </article>
+          <article class="mode-card mode-card-wide">
+            <div class="mode-card-top"><span class="mode-icon icon-table" aria-hidden="true"></span><span class="mode-badge">tile-table</span></div>
+            <h3 data-i18n="mode.tile.title">Pointings filtered by exposure</h3>
+            <p class="card-desc" data-i18n="mode.tile.body">Uses table-like RA/Dec inputs with an optional <code>NEXP</code> threshold. It is useful when a survey inventory contains tile pointings and only sufficiently exposed tiles should contribute.</p>
+            <p class="mode-caveat"><span data-i18n="mode.caveat">Important:</span> <span data-i18n="mode.tile.caveat">the threshold filters rows; it does not turn a pointing table into a measured instrument footprint.</span></p>
+          </article>
+        </div>
+        <div class="mode-table-wrap" tabindex="0">
+          <table class="data-table">
+            <caption data-i18n="modes.table.caption">The same output vocabulary, different evidence</caption>
+            <thead><tr><th scope="col" data-i18n="modes.table.mode">Mode</th><th scope="col" data-i18n="modes.table.reads">Reads</th><th scope="col" data-i18n="modes.table.makes">Makes cells by</th><th scope="col" data-i18n="modes.table.caveat">Boundary to remember</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>fits-wcs</code></th><td data-i18n="modes.table.fits.reads">2D celestial WCS</td><td data-i18n="modes.table.fits.makes">sampled polygon → mocpy</td><td data-i18n="modes.table.fits.caveat">whole WCS rectangle</td></tr>
+              <tr><th scope="row"><code>catalog-radec</code></th><td data-i18n="modes.table.catalog.reads">RA / Dec rows</td><td data-i18n="modes.table.catalog.makes">HEALPix point or cone</td><td data-i18n="modes.table.catalog.caveat">occupancy, not object index</td></tr>
+              <tr><th scope="row"><code>nested-healpix</code></th><td data-i18n="modes.table.nested.reads">NUNIQ or cells</td><td data-i18n="modes.table.nested.makes">validate and normalize</td><td data-i18n="modes.table.nested.caveat">ordering must be NESTED</td></tr>
+              <tr><th scope="row"><code>regions</code></th><td data-i18n="modes.table.regions.reads">DS9 / ZIP regions</td><td data-i18n="modes.table.regions.makes">upstream geometry → MOC</td><td data-i18n="modes.table.regions.caveat">frame semantics are delegated</td></tr>
+              <tr><th scope="row"><code>tile-table</code></th><td data-i18n="modes.table.tile.reads">pointings + NEXP</td><td data-i18n="modes.table.tile.makes">filtered point or cone</td><td data-i18n="modes.table.tile.caveat">threshold is not footprint truth</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="algorithms" class="doc-section" aria-labelledby="algorithms-title" data-title-key="nav.algorithmsSection">
+        <p class="section-tag">04 / <span data-i18n="algorithms.tag">The algorithm lab</span></p>
+        <h2 id="algorithms-title" data-i18n="algorithms.title">Three small rules make the result reproducible</h2>
+        <p class="section-lead" data-i18n="algorithms.lead">These demos use the same integer rules as the Python implementation. They are intentionally small: the point is to see what the Core promises, not to replace scientific validation.</p>
+
+        <div class="lab-grid">
+          <article class="lab-card lab-card-wide">
+            <div class="lab-card-heading"><div><p class="eyebrow">01 / <span data-i18n="lab.canonical.eyebrow">canonical cells</span></p><h3 data-i18n="lab.canonical.title">Many descriptions, one answer</h3></div><span class="algorithm-symbol">↘</span></div>
+            <p data-i18n="lab.canonical.body">A parent covers all of its descendants. Four complete children can become their parent. The result is sorted, deduplicated, and independent of shard order.</p>
+            <div class="lab-controls">
+              <label class="form-label" for="canonical-input"><span data-i18n="lab.cells.label">Cells as order/ipix</span><input id="canonical-input" class="form-input" type="text" value="7/25, 8/100, 8/101, 8/102, 8/103, 8/900" spellcheck="false"></label>
+              <button type="button" id="canonical-run" class="btn btn-primary"><span aria-hidden="true">↻</span><span data-i18n="lab.run">Normalize</span></button>
+            </div>
+            <div class="lab-result" id="canonical-output" role="status" aria-live="polite"></div>
+            <p class="form-note" data-i18n="lab.canonical.note">Try removing <code>7/25</code> to see four order-8 siblings collapse into it.</p>
+          </article>
+
+          <article class="lab-card">
+            <div class="lab-card-heading"><div><p class="eyebrow">02 / <span data-i18n="lab.uniq.eyebrow">NUNIQ</span></p><h3 data-i18n="lab.uniq.title">Give a cell one integer ID</h3></div><span class="algorithm-symbol">#</span></div>
+            <p data-i18n="lab.uniq.body">FITS stores one <code>UNIQ</code> value. The order is encoded in the size band; the pixel is the offset inside that band.</p>
+            <div class="split-controls">
+               <label class="form-label" for="uniq-order"><span data-i18n="lab.order">order</span><input id="uniq-order" class="form-input" type="number" min="0" max="29" value="8"></label>
+               <label class="form-label" for="uniq-ipix"><span data-i18n="lab.ipix">ipix</span><input id="uniq-ipix" class="form-input" type="text" inputmode="numeric" value="311296"></label>
+            </div>
+            <div class="lab-result" id="uniq-output" role="status" aria-live="polite"></div>
+            <div class="inline-divider"><span data-i18n="lab.uniq.decode">Decode a UNIQ</span></div>
+             <label class="form-label" for="uniq-value"><span>UNIQ</span><input id="uniq-value" class="form-input" type="text" inputmode="numeric" value="573440"></label>
+            <div class="lab-result compact-result" id="uniq-decoded" role="status" aria-live="polite"></div>
+          </article>
+
+          <article class="lab-card">
+            <div class="lab-card-heading"><div><p class="eyebrow">03 / <span data-i18n="lab.project.eyebrow">fixed-order projection</span></p><h3 data-i18n="lab.project.title">Compare at one resolution</h3></div><span class="algorithm-symbol">⇢</span></div>
+            <p data-i18n="lab.project.body">A finer cell maps to its containing coarse cell. A coarse cell expands to all descendants when a finer index is requested. That expansion adds candidates, not measurement detail.</p>
+            <label class="form-label" for="projection-input"><span data-i18n="lab.project.cells">Source cells</span><input id="projection-input" class="form-input" type="text" value="6/12, 8/311296, 8/311297" spellcheck="false"></label>
+            <div class="split-controls">
+              <label class="form-label" for="projection-order"><span data-i18n="lab.project.target">Target order</span><input id="projection-order" class="form-input" type="number" min="0" max="10" value="6"></label>
+              <button type="button" id="projection-run" class="btn btn-primary"><span aria-hidden="true">→</span><span data-i18n="lab.run">Project</span></button>
+            </div>
+            <div class="lab-result" id="projection-output" role="status" aria-live="polite"></div>
+          </article>
+        </div>
+
+        <div class="algorithm-note">
+          <span class="note-mark" aria-hidden="true">i</span>
+          <div><strong data-i18n="algorithms.note.title">Why not just use decimal coordinates?</strong><p data-i18n="algorithms.note.body">Coordinates are excellent input, but cells give a shared, bounded vocabulary for intersection and indexing. The Core keeps the frame, ordering, and actual order explicit so a consumer never has to guess what a number means.</p></div>
+        </div>
+      </section>
+
+      <section id="build" class="doc-section" aria-labelledby="build-title" data-title-key="nav.build">
+        <p class="section-tag">05 / <span data-i18n="build.tag">From snapshot to release</span></p>
+        <h2 id="build-title" data-i18n="build.title">Build once, inspect every artifact</h2>
+        <p class="section-lead" data-i18n="build.lead">The network step is explicit. After <code>refresh</code> locks a source snapshot and its SHA-256, the build path is offline and repeatable.</p>
+        <div class="code-box code-box-large">
+          <div class="code-header"><span>CLI / deterministic lifecycle</span><button type="button" class="copy-btn" data-copy-target="cli-code"><span aria-hidden="true">⧉</span><span data-i18n="copy.commands">Copy commands</span></button></div>
+          <pre id="cli-code" class="code-content" tabindex="0"><code class="language-bash"># The only network-enabled step
+astro-survey-moc-core refresh \
+  --spec recipe.json --snapshot-dir snapshots --lock recipe.lock.json
+
+# Everything after the lock reads local files
+SOURCE_DATE_EPOCH=1787184000 astro-survey-moc-core rebuild \
+  --spec recipe.lock.json --base-dir snapshots --output build
+
+astro-survey-moc-core project \
+  --moc build/layer.moc.fits --order 8 --output query-order8.json
+
+astro-survey-moc-core package build \
+  --spec package.json --output release.zip</code></pre>
+        </div>
+        <div class="artifact-output-grid">
+          <article class="output-card"><span class="output-icon icon-moc" aria-hidden="true"></span><h3><code>&lt;layer&gt;.moc.fits</code></h3><p data-i18n="build.output.moc">Authoritative IVOA FITS MOC: Primary HDU plus a MOC table with 64-bit NUNIQ cells.</p></article>
+          <article class="output-card"><span class="output-icon icon-query" aria-hidden="true"></span><h3><code>query-order8.json</code></h3><p data-i18n="build.output.query">Fixed-order NESTED pixels for fast lookup. The default query order is 8.</p></article>
+          <article class="output-card"><span class="output-icon icon-preview" aria-hidden="true"></span><h3><code>preview-order4.json</code></h3><p data-i18n="build.output.preview">A smaller overview projection. Upsampling it later cannot recover detail.</p></article>
+          <article class="output-card"><span class="output-icon icon-evidence" aria-hidden="true"></span><h3><code>statistics.json</code> + <code>provenance.json</code></h3><p data-i18n="build.output.evidence">Counts, area, source identity, and redacted build context for investigation.</p></article>
+        </div>
+
+        <div class="case-study">
+          <div class="case-study-header"><p class="eyebrow" data-i18n="case.eyebrow">Repository fixture / CSST W1</p><span class="status-pill status-simulated" data-i18n="case.badge">simulation evidence</span></div>
+          <h3 data-i18n="case.title">A real, bounded example</h3>
+          <p data-i18n="case.body">The conformance fixture records a reviewed union of simulated image inputs. Warehouse matched 178,056 image basenames; 178,055 were included after one pathological WCS input was excluded.</p>
+          <div class="case-stats">
+            <div><strong>6,763</strong><span data-i18n="case.stat.order8">order-8 cells</span></div>
+            <div><strong>46</strong><span data-i18n="case.stat.order4">order-4 preview cells</span></div>
+            <div><strong>354.7589°²</strong><span data-i18n="case.stat.area">measured area</span></div>
+          </div>
+          <p class="form-note" data-i18n="case.note">This is simulation evidence, not a formal CSST survey footprint. The project label “1000 square degrees” is not a measurement claim.</p>
+          <a class="text-link" href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/blob/main/fixtures/conformance/csst/README.md" target="_blank" rel="noopener noreferrer"><span data-i18n="case.link">Read the frozen fixture notes</span> ↗</a>
+        </div>
+
+        <div class="package-panel">
+          <div class="package-heading"><span class="package-mark" aria-hidden="true">ZIP</span><div><h3 data-i18n="package.title">Resource Package v3</h3><p data-i18n="package.body">The release envelope is closed, deterministic, and inspectable without a service.</p></div></div>
+          <pre class="tree-view"><code>resource-package.json
+mocs/&lt;layer-id&gt;.moc.fits
+footprints/survey-footprints.json
+provenance.json
+README.md</code></pre>
+          <p data-i18n="package.limits">The validator checks traversal, symlinks, encryption, duplicates, undeclared files, MOC headers, sizes, and SHA-256 values. It also enforces 10,000 entries, a 512 MiB entry limit, and a 2 GiB total limit.</p>
+        </div>
+      </section>
+
+      <section id="limits" class="doc-section" aria-labelledby="limits-title" data-title-key="nav.limits">
+        <p class="section-tag">06 / <span data-i18n="limits.tag">Read the fine print</span></p>
+        <h2 id="limits-title" data-i18n="limits.title">Useful evidence has honest boundaries</h2>
+        <p class="section-lead" data-i18n="limits.lead">The Core is intentionally narrow. These limits are part of the product contract, not footnotes to hide after a result is published.</p>
+        <div class="limits-grid">
+          <article class="limit-card"><span class="limit-label limit-supported" data-i18n="limits.supported.label">Supported</span><h3 data-i18n="limits.supported.title">Canonical spatial coverage</h3><p data-i18n="limits.supported.body">ICRS spatial MOCs, NESTED cells, deterministic union/canonicalization, fixed-order projections, FITS I/O, statistics, provenance, and Resource Package v3 validation.</p></article>
+          <article class="limit-card"><span class="limit-label limit-caution" data-i18n="limits.caution.label">Approximation</span><h3 data-i18n="limits.caution.title">A cell is not a boundary proof</h3><p data-i18n="limits.caution.body">WCS uses finite boundary samples and models a rectangle. A cell intersection is a candidate relation, not a continuous geometry error guarantee.</p></article>
+          <article class="limit-card"><span class="limit-label limit-absent" data-i18n="limits.absent.label">Not included</span><h3 data-i18n="limits.absent.title">No online astronomy service</h3><p data-i18n="limits.absent.body">There is no online search endpoint, visualization service, scientific reduction, time/frequency MOC, RING conversion, or intersection/difference query algebra here.</p></article>
+          <article class="limit-card"><span class="limit-label limit-caution" data-i18n="limits.caution.label">Validate</span><h3 data-i18n="limits.validator.title">FITS validation is focused</h3><p data-i18n="limits.validator.body"><code>validate_moc_fits()</code> checks the important ICRS/NUNIQ/MOC headers and decodable cells. It is not a complete external IVOA conformance validator.</p></article>
+          <article class="limit-card"><span class="limit-label limit-caution" data-i18n="limits.caution.label">Version note</span><h3 data-i18n="limits.version.title">Check the exact wheel</h3><p data-i18n="limits.version.body">The repository currently contains a version split: package metadata is 1.1.0 while <code>CORE_VERSION</code>, README, CLI, and task contract still say 1.0.0. Record the exact commit and wheel SHA-256.</p></article>
+          <article class="limit-card"><span class="limit-label limit-supported" data-i18n="limits.supported.label">Privacy</span><h3 data-i18n="limits.privacy.title">Credentials stay outside</h3><p data-i18n="limits.privacy.body">Refresh rejects URL credentials and provenance redacts userinfo, query fragments, and secret-like keys. Do not put credential values in recipes, evidence, logs, indices, or responses.</p></article>
+        </div>
+        <div class="callout callout-warning"><strong data-i18n="limits.warning.title">A preview never becomes a measurement.</strong> <span data-i18n="limits.warning.body">Order 4 is a compact view and order 8 is a common query projection. Neither can manufacture detail that was absent from the authoritative input.</span></div>
+        <h3 data-i18n="limits.reading.title">Where to verify the details</h3>
+        <div class="reading-links">
+          <a class="reading-link" href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/blob/main/docs/moc-core-contract.md" target="_blank" rel="noopener noreferrer"><strong>Core contract</strong><span data-i18n="limits.reading.contract">scientific representation and CLI rules</span><span aria-hidden="true">↗</span></a>
+          <a class="reading-link" href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/blob/main/contracts/resource-package-v3.schema.json" target="_blank" rel="noopener noreferrer"><strong>Resource Package schema</strong><span data-i18n="limits.reading.package">manifest shape and required fields</span><span aria-hidden="true">↗</span></a>
+          <a class="reading-link" href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK/tree/main/python-tests" target="_blank" rel="noopener noreferrer"><strong>Python tests</strong><span data-i18n="limits.reading.tests">behavioral examples and frozen fixtures</span><span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <noscript>
+        <div class="callout callout-info"><strong>JavaScript is disabled.</strong> The written documentation and code examples remain readable. Calculators, language switching, theme switching, and copy buttons need JavaScript.</div>
+      </noscript>
+      <p id="copy-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p><strong>MOC-Core-SDK</strong><br><span data-i18n="footer.description">Static documentation for a deterministic spatial core. Offline examples. No live service connection.</span></p>
+      <a href="https://github.com/Astro-Survey-Atlas/MOC-Core-SDK" target="_blank" rel="noopener noreferrer"><span data-i18n="footer.source">Source and canonical contracts on GitHub</span> ↗</a>
+    </div>
+  </footer>
+</body>
+</html>
