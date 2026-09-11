@@ -7,7 +7,7 @@ name = "astro-survey-moc-core"
 version = "1.1.0"
 description = "Deterministic, offline Astro Survey MOC Core SDK and resource-package tooling"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "astropy>=6.0",
   "astropy-healpix>=1.0",
