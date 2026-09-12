@@ -30,12 +30,7 @@
 
   function updateAsset(element, dark) {
     const attribute = element.tagName === "LINK" ? "href" : "src";
-    const current = element.getAttribute(attribute);
-    if (!current) {
-      return;
-    }
-    const base = current.split("#")[0];
-    element.setAttribute(attribute, dark ? `${base}#night` : base);
+    element.setAttribute(attribute, dark ? "assets/asa-mark-dark.svg" : "assets/asa-mark.svg");
   }
 
   function applyTheme(theme, persist) {
