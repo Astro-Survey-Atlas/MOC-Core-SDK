@@ -146,6 +146,7 @@ strong {
   position: sticky;
   z-index: 10;
   top: 0;
+  width: 100%;
   color: #fff;
   background: var(--header);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -280,8 +281,10 @@ strong {
   display: grid;
   grid-template-columns: 226px minmax(0, 1fr);
   gap: 48px;
-  width: min(var(--content-width), calc(100% - 40px));
+  max-width: 1440px;
+  width: 100%;
   margin: 0 auto;
+  position: relative;
 }
 
 .sidebar {
@@ -344,7 +347,8 @@ strong {
 
 .main-content {
   min-width: 0;
-  padding: 56px 0 100px;
+  max-width: 1000px;
+  padding: 56px 1.5rem 100px 0;
 }
 
 .doc-section,
@@ -1521,7 +1525,7 @@ h3 {
 
   .doc-wrapper {
     display: block;
-    width: min(100% - 28px, var(--content-width));
+    width: 100%;
   }
 
   .sidebar {
